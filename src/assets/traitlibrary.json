@@ -1,0 +1,30 @@
+[
+  {
+    "id": 0,
+    "name": "I Always Win",
+    "properties": [],
+    "short_text": "I Always Win",
+    "long_text": "I Always Win"
+  },
+  {
+    "id": 1,
+    "name": "Armed (Spear)",
+    "properties": ["weapon-spear", "core-power+1"],
+    "short_text": "Is armed with a spear, granting +1 Power",
+    "long_text": ""
+  },
+  {
+    "id": 2,
+    "name": "Crownbearer",
+    "properties": ["core-social+1"],
+    "short_text": "Has a crown which gives +1 Social.",
+    "long_text": ""
+  },
+  {
+    "id": 3,
+    "name": "Fishing Net",
+    "properties": ["core-survival+1"],
+    "short_text": "Has a fishing net which gives +1 Survival",
+    "long_text": ""
+  }
+]
