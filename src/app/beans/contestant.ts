@@ -35,6 +35,8 @@ export class Contestant {
   hasActed: boolean;
   location: string;
   party: number;
+  killCount: number;
+  meansOfDeath: string;
 
   constructor(json?: string) {
     this.name = json["name"] || "";
@@ -51,5 +53,12 @@ export class Contestant {
     this.hasActed = false;
     this.location = "";
     this.party = -1;
+    this.killCount = 0;
+    this.meansOfDeath = "";
+  }
+
+  kill(means: string) {
+    this.isAlive = false;
+    this.meansOfDeath = means;
   }
 }

@@ -69,7 +69,7 @@ export function removeContestantTrait(
 ) {
   let trait_to_remove = findTraitByID(id);
   if (roster[contestant].traits.includes(trait_to_remove)) {
-    roster[contestant].traits.filter(function(value, index, arr) {
+    roster[contestant].traits.filter(function(value, _index, _arr) {
       return value === trait_to_remove;
     });
     evaluateTrait(roster, contestant, trait_to_remove, true);

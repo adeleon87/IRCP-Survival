@@ -1,161 +1,119 @@
 import { format } from "../../services/formatter.service";
 import {
   countRemainingPending,
-  pullRandomContestantIndex
+  pullRandomContestantIndex,
+  killContestant
 } from "../../services/simulator.service";
 import {
   giveContestantTrait,
   findTraitsByPropertyFamily
 } from "../traithandler.service";
 
-let numFunctions = 6;
-let contestants = [];
-let valid = false;
-
-export function daySelector(roster) {
-  valid = false;
-  let text = "";
-  while (!valid) {
-    contestants = [];
-    text = "";
-
-    let randEvent = Math.floor(Math.random() * numFunctions);
-    let randContestant = Math.floor(Math.random() * roster.length);
-    while (roster[randContestant].hasActed || !roster[randContestant].isAlive) {
-      randContestant = Math.floor(Math.random() * roster.length);
-    }
-    contestants.push(randContestant);
-
-    switch (randEvent) {
-      case 0:
-        valid = true;
-        text = dayEvent1(roster);
-        break;
-      case 1:
-        valid = true;
-        text = dayEvent2(roster);
-        break;
-      case 2:
-        valid = true;
-        text = dayEvent3(roster);
-        break;
-      case 3:
-        valid = true;
-        text = dayEvent4(roster);
-        break;
-      case 4:
-        valid = true;
-        text = dayEvent5(roster);
-        break;
-      case 5:
-        valid = true;
-        text = dayEvent6(roster);
-        break;
-    }
-  }
-
-  let names = [];
-  for (let contestant in contestants) {
-    names.push(roster[contestants[contestant]].name);
-  }
-  return {
-    text: text,
-    img: names
-  };
-}
+export let functions = [
+  dayEvent1,
+  dayEvent2,
+  dayEvent3,
+  dayEvent4,
+  dayEvent5,
+  dayEvent6
+];
 
 // basic event
-function dayEvent1(roster) {
-  roster[contestants[0]].hasActed = true;
-  return format("@name1 picks flowers.", roster[contestants[0]]);
+function dayEvent1(roster, contestant) {
+  return format("@name1 picks flowers.", roster[contestant]);
 }
 
 // kill event
-function dayEvent2(roster) {
-  roster[contestants[0]].hasActed = true;
-  roster[contestants[0]].isAlive = false;
-  return format("@name1 blows up!", roster[contestants[0]]);
+function dayEvent2(roster, contestant) {
+  killContestant(roster, contestant, "unexpectedly blew up");
+  return format("@name1 blows up!", roster[contestant]);
 }
 
 // basic event
-function dayEvent3(roster) {
-  roster[contestants[0]].hasActed = true;
-  return format("@name1 wanders around.", roster[contestants[0]]);
+function dayEvent3(roster, contestant) {
+  return format("@name1 wanders around.", roster[contestant]);
 }
 
 // basic event with core stat conditionals, kill potential
-function dayEvent4(roster) {
-  roster[contestants[0]].hasActed = true;
+function dayEvent4(roster, contestant) {
   let text = "@name1 gets trapped in a random cave-in while looking for loot. ";
-  if (roster[contestants[0]].corePower >= 7) {
-    if (giveContestantTrait(roster, contestants[0], 3)) {
+  if (roster[contestant].corePower >= 7) {
+    if (giveContestantTrait(roster, contestant, 3)) {
       text +=
         "@subject1 easily moves the rubble out of the way, finding a forgotten fishing net. ";
       text +=
         "@name1's Survival goes from " +
-        (roster[contestants[0]].coreSurvival - 1) +
+        (roster[contestant].coreSurvival - 1) +
         " to " +
-        roster[contestants[0]].coreSurvival;
+        roster[contestant].coreSurvival;
     } else {
       text +=
         "@subject1 easily moves the rubble out of the way, grumbling about the lack of loot.";
     }
-  } else if (roster[contestants[0]].corePower >= 4) {
+  } else if (roster[contestant].corePower >= 4) {
     text +=
       "@subject1 manages to escape by the skin of @poss1 teeth, having to forgo any found loot.";
   } else {
-    roster[contestants[0]].isAlive = false;
+    killContestant(roster, contestant, "suffocated in a cave");
     text += "@subject1 is unable to escape, and will eventually suffocate!";
   }
-  return format(text, roster[contestants[0]]);
+  return format(text, roster[contestant]);
 }
 
 // event with multiple characters, kill event
-function dayEvent5(roster) {
+function dayEvent5(roster, contestant) {
   if (countRemainingPending(roster) < 2) {
-    valid = false;
     return "";
   }
-  roster[contestants[0]].hasActed = true;
-  contestants.push(pullRandomContestantIndex(roster));
-  roster[contestants[1]].hasActed = true;
-  roster[contestants[1]].isAlive = false;
+
+  let contestant_2 = pullRandomContestantIndex(roster);
+  roster[contestant_2].hasActed = true;
   let text = "@name1 kills @name2 ";
-  let weapons = findTraitsByPropertyFamily(roster, contestants[0], "weapon");
+  let weapons = findTraitsByPropertyFamily(roster, contestant, "weapon");
   if (weapons.length >= 1) {
     if (weapons[0].includes("weapon-spear")) {
       text += "by tossing a spear through @poss2 sternum!";
+      killContestant(
+        roster,
+        contestant_2,
+        "was speared through the sternum by " + roster[contestant].name
+      );
     }
   } else {
     text += "with @poss1 bare hands!";
+    killContestant(
+      roster,
+      contestant_2,
+      "was beaten down by " + roster[contestant].name
+    );
   }
-  return format(text, [roster[contestants[0]], roster[contestants[1]]]);
+  roster[contestant].killCount++;
+  return format(text, [roster[contestant], roster[contestant_2]]);
 }
 
-function dayEvent6(roster) {
-  roster[contestants[0]].hasActed = true;
+function dayEvent6(roster, contestant) {
   let text = "@name1 happens across a roving band of ancient tribal people. ";
-  if (roster[contestants[0]].coreSocial >= 7) {
-    if (giveContestantTrait(roster, contestants[0], 1)) {
+  if (roster[contestant].coreSocial >= 7) {
+    if (giveContestantTrait(roster, contestant, 1)) {
       text +=
         "@subject1 flags them down, and, thanks to @poss1 charm, receives a spear. ";
       text +=
         "@name1's Power goes from " +
-        (roster[contestants[0]].corePower - 1) +
+        (roster[contestant].corePower - 1) +
         " to " +
-        roster[contestants[0]].corePower +
+        roster[contestant].corePower +
         ".";
     } else {
       text +=
         "The roving band recognizes @object1, and @name1 goes @poss1 own way.";
     }
-  } else if (roster[contestants[0]].coreSocial >= 4) {
+  } else if (roster[contestant].coreSocial >= 4) {
     text +=
       "@subject1 waves at them, but they posture aggressively. @name1 opts to leave them alone.";
   } else {
-    roster[contestants[0]].isAlive = false;
+    killContestant(roster, contestant, "insulted a hostile tribe");
     text +=
       "@subject1 accidentally insults them, and is speared in the noggin!";
   }
-  return format(text, roster[contestants[0]]);
+  return format(text, roster[contestant]);
 }

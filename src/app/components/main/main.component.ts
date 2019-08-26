@@ -1,5 +1,5 @@
 import { Component, OnInit } from "@angular/core";
-import { simulation } from "../../services/simulator.service";
+import { simulation, death_tracker } from "../../services/simulator.service";
 import { getRoster } from "../../services/roster.service";
 
 @Component({
@@ -11,11 +11,31 @@ export class MainComponent implements OnInit {
   output = [];
   roster = [];
   running = false;
-  day_num;
-  is_day;
+  day_num = 0;
+  is_day = false;
+  show_result = false;
 
   ngOnInit() {
     console.log("init");
+  }
+
+  endRecap() {
+    this.output = [];
+    this.output.push({ img: "", text: "== Game Recap: ==" });
+    for (let i = 0; i < this.roster.length; i++) {
+      this.output.push({
+        img: [this.roster[death_tracker[i]]["name"]],
+        text:
+          this.roster.length -
+          i +
+          ": " +
+          this.roster[death_tracker[i]]["name"] +
+          " killed " +
+          this.roster[death_tracker[i]]["killCount"] +
+          " contestant(s) and " +
+          this.roster[death_tracker[i]]["meansOfDeath"]
+      });
+    }
   }
 
   run() {
@@ -28,9 +48,16 @@ export class MainComponent implements OnInit {
   }
 
   advance() {
-    if (this.output.length === 2) {
+    if (this.show_result && this.output.length === 2) {
+      this.endRecap();
+      return;
+    } else if (this.show_result) {
+      // end recap already shown, reset to beginning
       this.running = false;
+      this.show_result = false;
+      return;
     }
+
     if (!this.is_day) {
       this.day_num++;
       this.is_day = true;
@@ -44,8 +71,12 @@ export class MainComponent implements OnInit {
         document.documentElement.scrollTop || document.body.scrollTop;
       if (currentScroll > 0) {
         window.requestAnimationFrame(smoothscroll);
-        window.scrollTo(0, currentScroll - currentScroll / 2);
+        window.scrollTo(0, currentScroll - currentScroll / 1.5);
       }
     })();
+
+    if (this.output.length === 2) {
+      this.show_result = true;
+    }
   }
 }

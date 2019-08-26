@@ -43,13 +43,16 @@ function formatOneByOne(text, contestant: Contestant, number) {
 
 export function format(text, contestants: Array<Contestant> | Contestant) {
   let count = 1;
+  let names = [];
   if (contestants.length > 1) {
     for (let contestant of contestants) {
+      names.push(contestants[count - 1].name);
       text = formatOneByOne(text, contestant, count);
       count++;
     }
   } else {
     text = formatOneByOne(text, contestants, 1);
+    names.push(contestants.name);
   }
-  return text;
+  return { text: text, img: names };
 }
