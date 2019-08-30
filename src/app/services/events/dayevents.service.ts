@@ -8,15 +8,9 @@ import {
   giveContestantTrait,
   findTraitsByPropertyFamily
 } from "../traithandler.service";
+import { evaluateCheck } from "./eventmaster.service";
 
-export let functions = [
-  dayEvent1,
-  dayEvent2,
-  dayEvent3,
-  dayEvent4,
-  dayEvent5,
-  dayEvent6
-];
+export let functions = [dayEvent1, dayEvent3, dayEvent4, dayEvent5, dayEvent6];
 
 // basic event
 function dayEvent1(roster, contestant) {
@@ -37,7 +31,7 @@ function dayEvent3(roster, contestant) {
 // basic event with core stat conditionals, kill potential
 function dayEvent4(roster, contestant) {
   let text = "@name1 gets trapped in a random cave-in while looking for loot. ";
-  if (roster[contestant].corePower >= 7) {
+  if (evaluateCheck(roster, contestant, "normal", "coreSurvival")) {
     if (giveContestantTrait(roster, contestant, 3)) {
       text +=
         "@subject1 easily moves the rubble out of the way, finding a forgotten fishing net. ";
@@ -50,7 +44,7 @@ function dayEvent4(roster, contestant) {
       text +=
         "@subject1 easily moves the rubble out of the way, grumbling about the lack of loot.";
     }
-  } else if (roster[contestant].corePower >= 4) {
+  } else if (evaluateCheck(roster, contestant, "easy", "coreSurvival")) {
     text +=
       "@subject1 manages to escape by the skin of @poss1 teeth, having to forgo any found loot.";
   } else {
@@ -62,7 +56,7 @@ function dayEvent4(roster, contestant) {
 
 // event with multiple characters, kill event
 function dayEvent5(roster, contestant) {
-  if (countRemainingPending(roster) < 2) {
+  if (countRemainingPending(roster) < 1) {
     return "";
   }
 
@@ -71,7 +65,14 @@ function dayEvent5(roster, contestant) {
   let text = "@name1 kills @name2 ";
   let weapons = findTraitsByPropertyFamily(roster, contestant, "weapon");
   if (weapons.length >= 1) {
-    if (weapons[0].includes("weapon-spear")) {
+    if (weapons.some(row => row.includes("weapon-gun-laser"))) {
+      text += "by disintegrating @object2 with a laser gun!";
+      killContestant(
+        roster,
+        contestant_2,
+        "was disintegrated by " + roster[contestant].name
+      );
+    } else if (weapons.some(row => row.includes("weapon-spear"))) {
       text += "by tossing a spear through @poss2 sternum!";
       killContestant(
         roster,
@@ -93,7 +94,7 @@ function dayEvent5(roster, contestant) {
 
 function dayEvent6(roster, contestant) {
   let text = "@name1 happens across a roving band of ancient tribal people. ";
-  if (roster[contestant].coreSocial >= 7) {
+  if (evaluateCheck(roster, contestant, "normal", "coreSocial")) {
     if (giveContestantTrait(roster, contestant, 1)) {
       text +=
         "@subject1 flags them down, and, thanks to @poss1 charm, receives a spear. ";
@@ -107,7 +108,7 @@ function dayEvent6(roster, contestant) {
       text +=
         "The roving band recognizes @object1, and @name1 goes @poss1 own way.";
     }
-  } else if (roster[contestant].coreSocial >= 4) {
+  } else if (evaluateCheck(roster, contestant, "easy", "coreSocial")) {
     text +=
       "@subject1 waves at them, but they posture aggressively. @name1 opts to leave them alone.";
   } else {

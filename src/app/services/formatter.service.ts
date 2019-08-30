@@ -44,7 +44,7 @@ function formatOneByOne(text, contestant: Contestant, number) {
 export function format(text, contestants: Array<Contestant> | Contestant) {
   let count = 1;
   let names = [];
-  if (contestants.length > 1) {
+  if (contestants instanceof Array) {
     for (let contestant of contestants) {
       names.push(contestants[count - 1].name);
       text = formatOneByOne(text, contestant, count);

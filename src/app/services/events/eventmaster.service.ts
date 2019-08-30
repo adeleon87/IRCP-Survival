@@ -1,6 +1,47 @@
 import { functions as nightFunctions } from "./nightevents.service";
 import { functions as dayFunctions } from "./dayevents.service";
 
+let probability_table = {
+  "-5": 0.1,
+  "-4": 0.15,
+  "-3": 0.2,
+  "-2": 0.25,
+  "-1": 0.35,
+  "0": 0.5,
+  "1": 0.65,
+  "2": 0.75,
+  "3": 0.8,
+  "4": 0.85,
+  "5": 0.9
+};
+
+export function evaluateCheck(roster, contestant, difficulty, stat) {
+  let diff =
+    difficulty === "easy"
+      ? 3
+      : difficulty === "normal"
+      ? 6
+      : difficulty === "hard"
+      ? 9
+      : -1;
+  if (diff < 0) return;
+  let margin = roster[contestant][stat] - diff;
+  if (margin > 5) margin = 5;
+  if (margin < -5) margin = -5;
+  if (
+    !!probability_table[String(margin)] &&
+    Math.random() < probability_table[String(margin)]
+  ) {
+    //console.log("success! " + margin);
+    return true;
+  } else if (!!probability_table[String(margin)]) {
+    //console.log("failure! " + margin);
+    return false;
+  } else {
+    return undefined;
+  }
+}
+
 export function selector(roster, param_day_label) {
   let valid = false;
   let output = undefined;

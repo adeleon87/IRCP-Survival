@@ -26,5 +26,12 @@
     "properties": ["core-survival+1"],
     "short_text": "Has a fishing net which gives +1 Survival",
     "long_text": ""
+  },
+  {
+    "id": 4,
+    "name": "Armed (Laser Gun)",
+    "properties": ["weapon-gun-laser", "core-power+2"],
+    "short_text": "Is armed with a laser gun, granting +2 Power",
+    "long_text": ""
   }
 ]

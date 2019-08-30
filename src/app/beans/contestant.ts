@@ -29,6 +29,7 @@ export class Contestant {
   corePower: number;
   coreSurvival: number;
   coreSocial: number;
+  coreWits: number;
   traits: Array<Trait>;
   relationships: Array<Object>;
   isAlive: boolean;
@@ -46,6 +47,7 @@ export class Contestant {
     this.corePower = json["corePower"] || 0;
     this.coreSurvival = json["coreSurvival"] || 0;
     this.coreSocial = json["coreSocial"] || 0;
+    this.coreWits = json["coreWits"] || 0;
     this.traits = json["traits"] || [];
     this.relationships = json["relationships"] || [];
     this.isAlive = true;

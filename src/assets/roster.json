@@ -4,11 +4,11 @@
     "gender": "M",
     "isChild": false,
     "orientation": "HET",
-    "corePower": 8,
+    "corePower": 9,
     "coreSurvival": 4,
-    "coreSocial": 6,
-    "bio": "A big wolfy guy with a big wolfy punch.",
-    "traits": []
+    "coreSocial": 7,
+    "coreWits": 4,
+    "bio": "A big wolfy guy with a big wolfy punch."
   },
   {
     "name": "Isaac",
@@ -18,8 +18,8 @@
     "corePower": 4,
     "coreSurvival": 7,
     "coreSocial": 7,
-    "bio": "A wizarding boy, great with animals and smiles.",
-    "traits": []
+    "coreWits": 6,
+    "bio": "A wizarding boy, great with animals and smiles."
   },
   {
     "name": "Rogue AI",
@@ -27,32 +27,32 @@
     "isChild": false,
     "orientation": "ARO",
     "corePower": 11,
-    "coreSurvival": 6,
+    "coreSurvival": 3,
     "coreSocial": 1,
-    "bio": "A menacing, hyper-intelligent AI possessing a robotic shell.",
-    "traits": []
+    "coreWits": 9,
+    "bio": "A menacing, hyper-intelligent AI possessing a robotic shell."
   },
   {
     "name": "Lou",
     "gender": "M",
     "isChild": false,
     "orientation": "HET",
-    "corePower": 10,
+    "corePower": 9,
     "coreSurvival": 3,
     "coreSocial": 5,
-    "bio": "A superpowered mechanic and miscreant, equipped with massive metal arms.",
-    "traits": []
+    "coreWits": 7,
+    "bio": "A superpowered mechanic and miscreant, equipped with massive metal arms."
   },
   {
     "name": "Patches",
     "gender": "M",
     "isChild": false,
     "orientation": "ARO",
-    "corePower": 10,
-    "coreSurvival": 7,
-    "coreSocial": 1,
-    "bio": "A massive mountain troll, well-meaning but incredibly dull.",
-    "traits": []
+    "corePower": 11,
+    "coreSurvival": 9,
+    "coreSocial": 3,
+    "coreWits": 1,
+    "bio": "A massive mountain troll, well-meaning but incredibly dull."
   },
   {
     "name": "Eelis",
@@ -62,8 +62,8 @@
     "corePower": 5,
     "coreSurvival": 5,
     "coreSocial": 8,
-    "bio": "An unusual girl, constantly scheming with her magic over the mind.",
-    "traits": []
+    "coreWits": 6,
+    "bio": "An unusual girl, constantly scheming with her magic over the mind."
   },
   {
     "name": "Frankie",
@@ -71,9 +71,9 @@
     "isChild": false,
     "orientation": "BI",
     "corePower": 7,
-    "coreSurvival": 5,
+    "coreSurvival": 4,
     "coreSocial": 6,
-    "bio": "A friendly witch, possessing excellent hand-to-hand training and weaponized clothing.",
-    "traits": []
+    "coreWits": 7,
+    "bio": "A friendly witch, possessing excellent hand-to-hand training and weaponized clothing."
   }
 ]
