@@ -1,10 +1,23 @@
 import { format } from "../../services/formatter.service";
-import { giveContestantTrait } from "../traithandler.service";
-import { killContestant } from "../simulator.service";
-import { evaluateCheck } from "./eventmaster.service";
+import {
+  giveContestantTrait,
+  findTraitsByPropertyFamily
+} from "../traithandler.service";
+import {
+  killContestant,
+  countRemainingPending,
+  pullRandomContestantIndex
+} from "../simulator.service";
+import { evaluateCheck, evaluateCombat } from "./eventmaster.service";
 //
 //
-export let functions = [nightEvent1, nightEvent3, nightEvent4, nightEvent5];
+export let functions = [
+  nightEvent1,
+  nightEvent2,
+  nightEvent3,
+  nightEvent4,
+  nightEvent5
+];
 
 // basic event
 function nightEvent1(roster, contestant) {
@@ -13,8 +26,35 @@ function nightEvent1(roster, contestant) {
 
 // kill event
 function nightEvent2(roster, contestant) {
-  killContestant(roster, contestant, "got mauled by lions");
-  return format("@name1 is mauled by lions!", roster[contestant]);
+  if (countRemainingPending(roster) < 1) {
+    return "";
+  }
+
+  let contestant_2 = pullRandomContestantIndex(roster);
+  roster[contestant_2].hasActed = true;
+  let killer = evaluateCombat(roster, [contestant, contestant_2]);
+  let killed = killer === contestant ? contestant_2 : contestant;
+  let text =
+    "@name1 and @name2 cross paths while wandering in the night. @name1 suddenly ";
+  let weapons = findTraitsByPropertyFamily(roster, killer, "weapon");
+  if (weapons.length >= 1) {
+    if (weapons.some(row => row.includes("weapon-gun-laser"))) {
+      text += "unholsters their laser pistol and turns @name2 to dust!";
+      killContestant(roster, killed, "was evaporated " + roster[killer].name);
+    } else if (weapons.some(row => row.includes("weapon-spear"))) {
+      text += "grabs @poss1 spear and chucks it into @name2's neck!";
+      killContestant(
+        roster,
+        killed,
+        "was speared in the neck by " + roster[killer].name
+      );
+    }
+  } else {
+    text += "charges at @name2, beating @object2 into the ground!";
+    killContestant(roster, killed, "was beaten down by " + roster[killer].name);
+  }
+  roster[killer].killCount++;
+  return format(text, [roster[killer], roster[killed]]);
 }
 
 // basic event

@@ -8,7 +8,7 @@ import {
   giveContestantTrait,
   findTraitsByPropertyFamily
 } from "../traithandler.service";
-import { evaluateCheck } from "./eventmaster.service";
+import { evaluateCheck, evaluateCombat } from "./eventmaster.service";
 
 export let functions = [dayEvent1, dayEvent3, dayEvent4, dayEvent5, dayEvent6];
 
@@ -31,7 +31,7 @@ function dayEvent3(roster, contestant) {
 // basic event with core stat conditionals, kill potential
 function dayEvent4(roster, contestant) {
   let text = "@name1 gets trapped in a random cave-in while looking for loot. ";
-  if (evaluateCheck(roster, contestant, "normal", "coreSurvival")) {
+  if (evaluateCheck(roster, contestant, "normal", "corePower")) {
     if (giveContestantTrait(roster, contestant, 3)) {
       text +=
         "@subject1 easily moves the rubble out of the way, finding a forgotten fishing net. ";
@@ -44,7 +44,7 @@ function dayEvent4(roster, contestant) {
       text +=
         "@subject1 easily moves the rubble out of the way, grumbling about the lack of loot.";
     }
-  } else if (evaluateCheck(roster, contestant, "easy", "coreSurvival")) {
+  } else if (evaluateCheck(roster, contestant, "easy", "corePower")) {
     text +=
       "@subject1 manages to escape by the skin of @poss1 teeth, having to forgo any found loot.";
   } else {
@@ -62,34 +62,33 @@ function dayEvent5(roster, contestant) {
 
   let contestant_2 = pullRandomContestantIndex(roster);
   roster[contestant_2].hasActed = true;
-  let text = "@name1 kills @name2 ";
-  let weapons = findTraitsByPropertyFamily(roster, contestant, "weapon");
+  let killer = evaluateCombat(roster, [contestant, contestant_2]);
+  let killed = killer === contestant ? contestant_2 : contestant;
+  let text =
+    "@name1 and @name2 meet each other in a clearing. @name1 then kills @name2 ";
+  let weapons = findTraitsByPropertyFamily(roster, killer, "weapon");
   if (weapons.length >= 1) {
     if (weapons.some(row => row.includes("weapon-gun-laser"))) {
       text += "by disintegrating @object2 with a laser gun!";
       killContestant(
         roster,
-        contestant_2,
-        "was disintegrated by " + roster[contestant].name
+        killed,
+        "was disintegrated by " + roster[killer].name
       );
     } else if (weapons.some(row => row.includes("weapon-spear"))) {
       text += "by tossing a spear through @poss2 sternum!";
       killContestant(
         roster,
-        contestant_2,
-        "was speared through the sternum by " + roster[contestant].name
+        killed,
+        "was speared through the sternum by " + roster[killer].name
       );
     }
   } else {
     text += "with @poss1 bare hands!";
-    killContestant(
-      roster,
-      contestant_2,
-      "was beaten down by " + roster[contestant].name
-    );
+    killContestant(roster, killed, "was beaten down by " + roster[killer].name);
   }
-  roster[contestant].killCount++;
-  return format(text, [roster[contestant], roster[contestant_2]]);
+  roster[killer].killCount++;
+  return format(text, [roster[killer], roster[killed]]);
 }
 
 function dayEvent6(roster, contestant) {

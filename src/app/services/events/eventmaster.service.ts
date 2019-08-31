@@ -15,17 +15,8 @@ let probability_table = {
   "5": 0.9
 };
 
-export function evaluateCheck(roster, contestant, difficulty, stat) {
-  let diff =
-    difficulty === "easy"
-      ? 3
-      : difficulty === "normal"
-      ? 6
-      : difficulty === "hard"
-      ? 9
-      : -1;
-  if (diff < 0) return;
-  let margin = roster[contestant][stat] - diff;
+function runProbability(margin) {
+  //console.log(margin);
   if (margin > 5) margin = 5;
   if (margin < -5) margin = -5;
   if (
@@ -40,6 +31,29 @@ export function evaluateCheck(roster, contestant, difficulty, stat) {
   } else {
     return undefined;
   }
+}
+
+export function evaluateCheck(roster, contestant, difficulty, stat) {
+  let diff =
+    difficulty === "easy"
+      ? 3
+      : difficulty === "normal"
+      ? 6
+      : difficulty === "hard"
+      ? 9
+      : -1;
+  if (diff < 0) return;
+  let margin = roster[contestant][stat] - diff;
+  return runProbability(margin);
+}
+
+export function evaluateCombat(roster, contestants) {
+  let margin =
+    roster[contestants[0]].corePower - roster[contestants[1]].corePower;
+  let first_wins = runProbability(margin);
+  if (first_wins) return contestants[0];
+  else if (!first_wins) return contestants[1];
+  else return undefined;
 }
 
 export function selector(roster, param_day_label) {
