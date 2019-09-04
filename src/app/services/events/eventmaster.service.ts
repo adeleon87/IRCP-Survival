@@ -93,9 +93,16 @@ export function evaluateCombat(roster, contestants) {
 }
 
 export function evaluateSocial(roster, contestants, is_combat_check) {
-  let margin = Math.min(
-    roster[contestants[0]]["relationships"][contestants[1]],
-    roster[contestants[1]]["relationships"][contestants[0]]
+  if (roster[contestants[0]]["relationships"][contestants[1]] === undefined) {
+    roster[contestants[0]]["relationships"][contestants[1]] = 0;
+  }
+  if (roster[contestants[1]]["relationships"][contestants[0]] === undefined) {
+    roster[contestants[1]]["relationships"][contestants[0]] = 0;
+  }
+  let margin = Math.ceil(
+    (roster[contestants[0]]["relationships"][contestants[1]] +
+      roster[contestants[1]]["relationships"][contestants[0]]) /
+      2
   );
   if (is_combat_check) {
     return runProbability(margin);

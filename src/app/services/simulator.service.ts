@@ -32,6 +32,7 @@ function findWinner(roster) {
       death_tracker.push(i);
     }
   }
+  console.log(roster);
   return name;
 }
 
@@ -106,9 +107,10 @@ export function simulation(
   });
 
   if (countRemainingAlive(roster) === 1) {
+    let winner = findWinner(roster);
     output = output.concat({
-      text: findWinner(roster) + " is the winner!",
-      img: [findWinner(roster)]
+      text: winner + " is the winner!",
+      img: [winner]
     });
     return output;
   }

@@ -8,9 +8,20 @@ import {
   giveContestantTrait,
   findTraitsByPropertyFamily
 } from "../traithandler.service";
-import { evaluateCheck, evaluateCombat } from "./eventmaster.service";
+import {
+  evaluateCheck,
+  evaluateCombat,
+  evaluateSocial
+} from "./eventmaster.service";
 
-export let functions = [dayEvent1, dayEvent3, dayEvent4, dayEvent5, dayEvent6];
+export let functions = [
+  dayEvent1,
+  dayEvent3,
+  dayEvent4,
+  dayEvent5,
+  dayEvent6,
+  dayEvent7
+];
 
 // basic event
 function dayEvent1(roster, contestant) {
@@ -116,4 +127,25 @@ function dayEvent6(roster, contestant) {
       "@subject1 accidentally insults them, and is speared in the noggin!";
   }
   return format(text, roster[contestant]);
+}
+
+function dayEvent7(roster, contestant) {
+  if (countRemainingPending(roster) < 1) {
+    return "";
+  }
+
+  let contestant_2 = pullRandomContestantIndex(roster);
+  roster[contestant_2].hasActed = true;
+
+  let text = "@name1 gets in trouble with some of the local wildlife. ";
+  if (evaluateSocial(roster, [contestant, contestant_2], false) >= 0) {
+    text +=
+      "@name2 arrives and helps @object1 with fending them off. The two of them part amicably, their Relationship increasing by 2.";
+    roster[contestant].modifyRelationship(contestant_2, +2);
+    roster[contestant_2].modifyRelationship(contestant, +2);
+  } else {
+    text +=
+      "@name2, seeing @object1 struggling, leaves @object1 to handle it themselves.";
+  }
+  return format(text, [roster[contestant], roster[contestant_2]]);
 }

@@ -10,12 +10,17 @@ function parseJSON(json) {
   return roster;
 }
 
-export function getRoster() {
-  let json = src_json;
-  let roster = parseJSON(json);
+function initializeRoster(roster) {
   roster.forEach(contestant => {
     contestant.isAlive = true;
     contestant.traits = [];
   });
   return roster;
+}
+
+export function getRoster() {
+  let json = src_json;
+  let roster = parseJSON(json);
+
+  return initializeRoster(roster);
 }

@@ -31,7 +31,7 @@ export class Contestant {
   coreSocial: number;
   coreWits: number;
   traits: Array<Trait>;
-  relationships: Array<Object>;
+  relationships: Array<number>;
   isAlive: boolean;
   hasActed: boolean;
   location: string;
@@ -62,5 +62,15 @@ export class Contestant {
   kill(means: string) {
     this.isAlive = false;
     this.meansOfDeath = means;
+  }
+
+  modifyRelationship(target: string, amount: number) {
+    if (this.relationships[target] + amount >= 5) {
+      this.relationships[target] = 5;
+    } else if (this.relationships[target] + amount <= -5) {
+      this.relationships[target] = -5;
+    } else {
+      this.relationships[target] += amount;
+    }
   }
 }

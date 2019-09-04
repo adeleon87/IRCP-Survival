@@ -8,7 +8,11 @@ import {
   countRemainingPending,
   pullRandomContestantIndex
 } from "../simulator.service";
-import { evaluateCheck, evaluateCombat } from "./eventmaster.service";
+import {
+  evaluateCheck,
+  evaluateCombat,
+  evaluateSocial
+} from "./eventmaster.service";
 //
 //
 export let functions = [
@@ -16,7 +20,8 @@ export let functions = [
   nightEvent2,
   nightEvent3,
   nightEvent4,
-  nightEvent5
+  nightEvent5,
+  nightEvent6
 ];
 
 // basic event
@@ -117,4 +122,33 @@ function nightEvent5(roster, contestant) {
       "@subject1 accidentally enters a bear den, and is eviserated by an angry mother bear!";
   }
   return format(text, roster[contestant]);
+}
+
+function nightEvent6(roster, contestant) {
+  if (countRemainingPending(roster) < 1) {
+    return "";
+  }
+
+  let contestant_2 = pullRandomContestantIndex(roster);
+  roster[contestant_2].hasActed = true;
+
+  let text =
+    "@name1 and @name2, both exhausted, wander into the same abandoned home. ";
+  let social_result = evaluateSocial(roster, [contestant, contestant_2], false);
+
+  if (social_result === -1) {
+    text +=
+      "The two get into a heated argument over who gets to stay, and end up attracting some hostile wildlife. They flee the home. Their Relationship is decreased by 1.";
+    roster[contestant].modifyRelationship(contestant_2, -1);
+    roster[contestant_2].modifyRelationship(contestant, -1);
+  } else if (social_result === 0) {
+    text +=
+      "The two, wary of each other, agree to sleep in the same building, but neither can trust the other enough to get any restful sleep.";
+  } else if (social_result === 1) {
+    text +=
+      "The two agree to share the shelter, and get restful sleep. Their Relationship is increased by 1.";
+    roster[contestant].modifyRelationship(contestant_2, 1);
+    roster[contestant_2].modifyRelationship(contestant, 1);
+  }
+  return format(text, [roster[contestant], roster[contestant_2]]);
 }
