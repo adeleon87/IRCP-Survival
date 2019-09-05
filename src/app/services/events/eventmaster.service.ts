@@ -120,11 +120,11 @@ function evaluatePreconditons(roster, contestants, preconditions) {
   for (let index in preconditions) {
     if (preconditions[index].startsWith("num-contestants: ")) {
       let num = Number(preconditions[index].substr(17));
-      if (countRemainingPending(roster) < num) return false;
+      if (countRemainingPending(roster) < num - 1) return false;
       else {
-        roster[contestants[0]].hasActed = true;
-        for (let i = 0; i < num - 1; i++) {
+        for (let i = 1; i < num; i++) {
           contestants.push(pullRandomContestantIndex(roster));
+          roster[contestants[i]].hasActed = true;
         }
       }
     } else if (preconditions[index] === "check-social-combat") {
@@ -146,6 +146,7 @@ export function selector(roster, param_day_label) {
       roster[randContestants[0]].hasActed ||
       !roster[randContestants[0]].isAlive
     );
+    roster[randContestants[0]].hasActed = true;
 
     if (param_day_label === "Day") {
       let randEvent = Math.floor(Math.random() * dayFunctions.length);
@@ -157,6 +158,9 @@ export function selector(roster, param_day_label) {
             dayFunctions[randEvent]["preconditions"]
           )
         ) {
+          for (let index of randContestants) {
+            roster[index].hasActed = false;
+          }
           continue;
         }
       }
@@ -175,13 +179,13 @@ export function selector(roster, param_day_label) {
             nightFunctions[randEvent]["preconditions"]
           )
         ) {
+          for (let index of randContestants) {
+            roster[index].hasActed = false;
+          }
           continue;
         }
       }
       valid = true;
-      for (let index of randContestants) {
-        roster[index].hasActed = true;
-      }
       output = nightFunctions[randEvent]["function"](roster, randContestants);
     }
   }
