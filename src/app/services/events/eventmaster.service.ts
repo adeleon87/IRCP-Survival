@@ -1,5 +1,6 @@
 import { functions as nightFunctions } from "./nightevents.service";
 import { functions as dayFunctions } from "./dayevents.service";
+import { countRemainingPending } from "../simulator.service";
 
 let probability_table = {
   "-5": 0.1,
@@ -111,31 +112,66 @@ export function evaluateSocial(roster, contestants, is_combat_check) {
   }
 }
 
+function evaluatePreconditons(roster, contestant, preconditions) {
+  console.log("evaluation");
+  for (let index in preconditions) {
+    console.log(preconditions[index]);
+    if (preconditions[index].startsWith("num-contestants: ")) {
+      if (
+        countRemainingPending(roster) < Number(preconditions[index].substr(17))
+      ) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 export function selector(roster, param_day_label) {
   let valid = false;
   let output = undefined;
+  let randContestant = undefined;
 
   while (!valid) {
-    output = undefined;
-    valid = true;
-
-    let randContestant = Math.floor(Math.random() * roster.length);
-    while (roster[randContestant].hasActed || !roster[randContestant].isAlive) {
+    do {
       randContestant = Math.floor(Math.random() * roster.length);
-    }
-    roster[randContestant].hasActed = true;
+    } while (
+      roster[randContestant].hasActed ||
+      !roster[randContestant].isAlive
+    );
 
     if (param_day_label === "Day") {
       let randEvent = Math.floor(Math.random() * dayFunctions.length);
-      output = dayFunctions[randEvent](roster, randContestant);
+      if (dayFunctions[randEvent]["preconditions"].length > 0) {
+        if (
+          !evaluatePreconditons(
+            roster,
+            randContestant,
+            dayFunctions[randEvent]["preconditions"]
+          )
+        ) {
+          continue;
+        }
+      }
+      roster[randContestant].hasActed = true;
+      valid = true;
+      output = dayFunctions[randEvent]["function"](roster, randContestant);
     } else if (param_day_label === "Night") {
       let randEvent = Math.floor(Math.random() * nightFunctions.length);
-      output = nightFunctions[randEvent](roster, randContestant);
-    }
-
-    if (output["text"] === undefined) {
-      valid = false;
-      roster[randContestant].hasActed = false;
+      if (nightFunctions[randEvent]["preconditions"].length > 0) {
+        if (
+          !evaluatePreconditons(
+            roster,
+            randContestant,
+            nightFunctions[randEvent]["preconditions"]
+          )
+        ) {
+          continue;
+        }
+      }
+      roster[randContestant].hasActed = true;
+      valid = true;
+      output = nightFunctions[randEvent]["function"](roster, randContestant);
     }
   }
   return output;

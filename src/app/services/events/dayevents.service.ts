@@ -1,6 +1,5 @@
 import { format } from "../../services/formatter.service";
 import {
-  countRemainingPending,
   pullRandomContestantIndex,
   killContestant
 } from "../../services/simulator.service";
@@ -15,12 +14,13 @@ import {
 } from "./eventmaster.service";
 
 export let functions = [
-  dayEvent1,
-  dayEvent3,
-  dayEvent4,
-  dayEvent5,
-  dayEvent6,
-  dayEvent7
+  { function: dayEvent1, preconditions: [] },
+  { function: dayEvent2, preconditions: [] },
+  { function: dayEvent3, preconditions: [] },
+  { function: dayEvent4, preconditions: [] },
+  { function: dayEvent5, preconditions: ["num-contestants: 2"] },
+  { function: dayEvent6, preconditions: [] },
+  { function: dayEvent7, preconditions: ["num-contestants: 2"] }
 ];
 
 // basic event
@@ -30,8 +30,11 @@ function dayEvent1(roster, contestant) {
 
 // kill event
 function dayEvent2(roster, contestant) {
-  killContestant(roster, contestant, "unexpectedly blew up");
-  return format("@name1 blows up!", roster[contestant]);
+  killContestant(roster, contestant, "fell in a trap");
+  return format(
+    "@name1 steps in a spike trap and bleeds out!",
+    roster[contestant]
+  );
 }
 
 // basic event
@@ -67,10 +70,6 @@ function dayEvent4(roster, contestant) {
 
 // event with multiple characters, kill event
 function dayEvent5(roster, contestant) {
-  if (countRemainingPending(roster) < 1) {
-    return "";
-  }
-
   let contestant_2 = pullRandomContestantIndex(roster);
   roster[contestant_2].hasActed = true;
   let killer = evaluateCombat(roster, [contestant, contestant_2]);
@@ -130,10 +129,6 @@ function dayEvent6(roster, contestant) {
 }
 
 function dayEvent7(roster, contestant) {
-  if (countRemainingPending(roster) < 1) {
-    return "";
-  }
-
   let contestant_2 = pullRandomContestantIndex(roster);
   roster[contestant_2].hasActed = true;
 

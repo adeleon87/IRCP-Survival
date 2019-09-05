@@ -5,7 +5,6 @@ import {
 } from "../traithandler.service";
 import {
   killContestant,
-  countRemainingPending,
   pullRandomContestantIndex
 } from "../simulator.service";
 import {
@@ -16,12 +15,12 @@ import {
 //
 //
 export let functions = [
-  nightEvent1,
-  nightEvent2,
-  nightEvent3,
-  nightEvent4,
-  nightEvent5,
-  nightEvent6
+  { function: nightEvent1, preconditions: [] },
+  { function: nightEvent2, preconditions: ["num-contestants: 2"] },
+  { function: nightEvent3, preconditions: [] },
+  { function: nightEvent4, preconditions: [] },
+  { function: nightEvent5, preconditions: [] },
+  { function: nightEvent6, preconditions: ["num-contestants: 2"] }
 ];
 
 // basic event
@@ -31,10 +30,6 @@ function nightEvent1(roster, contestant) {
 
 // kill event
 function nightEvent2(roster, contestant) {
-  if (countRemainingPending(roster) < 1) {
-    return "";
-  }
-
   let contestant_2 = pullRandomContestantIndex(roster);
   roster[contestant_2].hasActed = true;
   let killer = evaluateCombat(roster, [contestant, contestant_2]);
@@ -125,10 +120,6 @@ function nightEvent5(roster, contestant) {
 }
 
 function nightEvent6(roster, contestant) {
-  if (countRemainingPending(roster) < 1) {
-    return "";
-  }
-
   let contestant_2 = pullRandomContestantIndex(roster);
   roster[contestant_2].hasActed = true;
 
