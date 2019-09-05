@@ -1,8 +1,5 @@
 import { format } from "../../services/formatter.service";
-import {
-  pullRandomContestantIndex,
-  killContestant
-} from "../../services/simulator.service";
+import { killContestant } from "../../services/simulator.service";
 import {
   giveContestantTrait,
   findTraitsByPropertyFamily
@@ -18,18 +15,23 @@ export let functions = [
   { function: dayEvent2, preconditions: [] },
   { function: dayEvent3, preconditions: [] },
   { function: dayEvent4, preconditions: [] },
-  { function: dayEvent5, preconditions: ["num-contestants: 2"] },
+  {
+    function: dayEvent5,
+    preconditions: ["num-contestants: 2", "check-social-combat"]
+  },
   { function: dayEvent6, preconditions: [] },
   { function: dayEvent7, preconditions: ["num-contestants: 2"] }
 ];
 
 // basic event
-function dayEvent1(roster, contestant) {
+function dayEvent1(roster, contestant_list) {
+  let contestant = contestant_list[0];
   return format("@name1 picks flowers.", roster[contestant]);
 }
 
 // kill event
-function dayEvent2(roster, contestant) {
+function dayEvent2(roster, contestant_list) {
+  let contestant = contestant_list[0];
   killContestant(roster, contestant, "fell in a trap");
   return format(
     "@name1 steps in a spike trap and bleeds out!",
@@ -38,12 +40,14 @@ function dayEvent2(roster, contestant) {
 }
 
 // basic event
-function dayEvent3(roster, contestant) {
+function dayEvent3(roster, contestant_list) {
+  let contestant = contestant_list[0];
   return format("@name1 wanders around.", roster[contestant]);
 }
 
 // basic event with core stat conditionals, kill potential
-function dayEvent4(roster, contestant) {
+function dayEvent4(roster, contestant_list) {
+  let contestant = contestant_list[0];
   let text = "@name1 gets trapped in a random cave-in while looking for loot. ";
   if (evaluateCheck(roster, contestant, "normal", "corePower")) {
     if (giveContestantTrait(roster, contestant, 3)) {
@@ -69,11 +73,11 @@ function dayEvent4(roster, contestant) {
 }
 
 // event with multiple characters, kill event
-function dayEvent5(roster, contestant) {
-  let contestant_2 = pullRandomContestantIndex(roster);
-  roster[contestant_2].hasActed = true;
-  let killer = evaluateCombat(roster, [contestant, contestant_2]);
-  let killed = killer === contestant ? contestant_2 : contestant;
+function dayEvent5(roster, contestant_list) {
+  let killer = evaluateCombat(roster, [contestant_list[0], contestant_list[1]]);
+  let killed =
+    killer === contestant_list[0] ? contestant_list[1] : contestant_list[0];
+
   let text =
     "@name1 and @name2 meet each other in a clearing. @name1 then kills @name2 ";
   let weapons = findTraitsByPropertyFamily(roster, killer, "weapon");
@@ -101,7 +105,8 @@ function dayEvent5(roster, contestant) {
   return format(text, [roster[killer], roster[killed]]);
 }
 
-function dayEvent6(roster, contestant) {
+function dayEvent6(roster, contestant_list) {
+  let contestant = contestant_list[0];
   let text = "@name1 happens across a roving band of ancient tribal people. ";
   if (evaluateCheck(roster, contestant, "normal", "coreSocial")) {
     if (giveContestantTrait(roster, contestant, 1)) {
@@ -128,12 +133,12 @@ function dayEvent6(roster, contestant) {
   return format(text, roster[contestant]);
 }
 
-function dayEvent7(roster, contestant) {
-  let contestant_2 = pullRandomContestantIndex(roster);
-  roster[contestant_2].hasActed = true;
+function dayEvent7(roster, contestant_list) {
+  let contestant = contestant_list[0];
+  let contestant_2 = contestant_list[1];
 
   let text = "@name1 gets in trouble with some of the local wildlife. ";
-  if (evaluateSocial(roster, [contestant, contestant_2], false) >= 0) {
+  if (evaluateSocial(roster, [contestant, contestant_2], false) === 1) {
     text +=
       "@name2 arrives and helps @object1 with fending them off. The two of them part amicably, their Relationship increasing by 2.";
     roster[contestant].modifyRelationship(contestant_2, +2);

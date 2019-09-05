@@ -1,6 +1,9 @@
 import { functions as nightFunctions } from "./nightevents.service";
 import { functions as dayFunctions } from "./dayevents.service";
-import { countRemainingPending } from "../simulator.service";
+import {
+  countRemainingPending,
+  pullRandomContestantIndex
+} from "../simulator.service";
 
 let probability_table = {
   "-5": 0.1,
@@ -106,22 +109,26 @@ export function evaluateSocial(roster, contestants, is_combat_check) {
       2
   );
   if (is_combat_check) {
+    margin *= -1;
     return runProbability(margin);
   } else {
     return runSocialProbability(margin);
   }
 }
 
-function evaluatePreconditons(roster, contestant, preconditions) {
-  console.log("evaluation");
+function evaluatePreconditons(roster, contestants, preconditions) {
   for (let index in preconditions) {
-    console.log(preconditions[index]);
     if (preconditions[index].startsWith("num-contestants: ")) {
-      if (
-        countRemainingPending(roster) < Number(preconditions[index].substr(17))
-      ) {
-        return false;
+      let num = Number(preconditions[index].substr(17));
+      if (countRemainingPending(roster) < num) return false;
+      else {
+        roster[contestants[0]].hasActed = true;
+        for (let i = 0; i < num - 1; i++) {
+          contestants.push(pullRandomContestantIndex(roster));
+        }
       }
+    } else if (preconditions[index] === "check-social-combat") {
+      if (!evaluateSocial(roster, contestants, true)) return false;
     }
   }
   return true;
@@ -130,14 +137,14 @@ function evaluatePreconditons(roster, contestant, preconditions) {
 export function selector(roster, param_day_label) {
   let valid = false;
   let output = undefined;
-  let randContestant = undefined;
+  let randContestants = [];
 
   while (!valid) {
     do {
-      randContestant = Math.floor(Math.random() * roster.length);
+      randContestants[0] = Math.floor(Math.random() * roster.length);
     } while (
-      roster[randContestant].hasActed ||
-      !roster[randContestant].isAlive
+      roster[randContestants[0]].hasActed ||
+      !roster[randContestants[0]].isAlive
     );
 
     if (param_day_label === "Day") {
@@ -146,32 +153,36 @@ export function selector(roster, param_day_label) {
         if (
           !evaluatePreconditons(
             roster,
-            randContestant,
+            randContestants,
             dayFunctions[randEvent]["preconditions"]
           )
         ) {
           continue;
         }
       }
-      roster[randContestant].hasActed = true;
       valid = true;
-      output = dayFunctions[randEvent]["function"](roster, randContestant);
+      for (let index of randContestants) {
+        roster[index].hasActed = true;
+      }
+      output = dayFunctions[randEvent]["function"](roster, randContestants);
     } else if (param_day_label === "Night") {
       let randEvent = Math.floor(Math.random() * nightFunctions.length);
       if (nightFunctions[randEvent]["preconditions"].length > 0) {
         if (
           !evaluatePreconditons(
             roster,
-            randContestant,
+            randContestants,
             nightFunctions[randEvent]["preconditions"]
           )
         ) {
           continue;
         }
       }
-      roster[randContestant].hasActed = true;
       valid = true;
-      output = nightFunctions[randEvent]["function"](roster, randContestant);
+      for (let index of randContestants) {
+        roster[index].hasActed = true;
+      }
+      output = nightFunctions[randEvent]["function"](roster, randContestants);
     }
   }
   return output;

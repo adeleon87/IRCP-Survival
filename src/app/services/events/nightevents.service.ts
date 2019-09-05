@@ -3,10 +3,7 @@ import {
   giveContestantTrait,
   findTraitsByPropertyFamily
 } from "../traithandler.service";
-import {
-  killContestant,
-  pullRandomContestantIndex
-} from "../simulator.service";
+import { killContestant } from "../simulator.service";
 import {
   evaluateCheck,
   evaluateCombat,
@@ -16,7 +13,10 @@ import {
 //
 export let functions = [
   { function: nightEvent1, preconditions: [] },
-  { function: nightEvent2, preconditions: ["num-contestants: 2"] },
+  {
+    function: nightEvent2,
+    preconditions: ["num-contestants: 2", "check-social-combat"]
+  },
   { function: nightEvent3, preconditions: [] },
   { function: nightEvent4, preconditions: [] },
   { function: nightEvent5, preconditions: [] },
@@ -24,22 +24,23 @@ export let functions = [
 ];
 
 // basic event
-function nightEvent1(roster, contestant) {
+function nightEvent1(roster, contestant_list) {
+  let contestant = contestant_list[0];
   return format("@name1 sleeps soundly.", roster[contestant]);
 }
 
 // kill event
-function nightEvent2(roster, contestant) {
-  let contestant_2 = pullRandomContestantIndex(roster);
-  roster[contestant_2].hasActed = true;
-  let killer = evaluateCombat(roster, [contestant, contestant_2]);
-  let killed = killer === contestant ? contestant_2 : contestant;
+function nightEvent2(roster, contestant_list) {
+  let killer = evaluateCombat(roster, [contestant_list[0], contestant_list[1]]);
+  let killed =
+    killer === contestant_list[0] ? contestant_list[1] : contestant_list[0];
+
   let text =
     "@name1 and @name2 cross paths while wandering in the night. @name1 suddenly ";
   let weapons = findTraitsByPropertyFamily(roster, killer, "weapon");
   if (weapons.length >= 1) {
     if (weapons.some(row => row.includes("weapon-gun-laser"))) {
-      text += "unholsters their laser pistol and turns @name2 to dust!";
+      text += "unholsters @poss1 laser pistol and turns @name2 to dust!";
       killContestant(roster, killed, "was evaporated " + roster[killer].name);
     } else if (weapons.some(row => row.includes("weapon-spear"))) {
       text += "grabs @poss1 spear and chucks it into @name2's neck!";
@@ -58,12 +59,14 @@ function nightEvent2(roster, contestant) {
 }
 
 // basic event
-function nightEvent3(roster, contestant) {
+function nightEvent3(roster, contestant_list) {
+  let contestant = contestant_list[0];
   return format("@name1 is unable to sleep.", roster[contestant]);
 }
 
 // event with trait conditionals, kill potential
-function nightEvent4(roster, contestant) {
+function nightEvent4(roster, contestant_list) {
+  let contestant = contestant_list[0];
   let text =
     "@name1, while searching for a safe place to sleep, finds an abandoned mech. ";
   if (evaluateCheck(roster, contestant, "normal", "coreWits")) {
@@ -94,7 +97,8 @@ function nightEvent4(roster, contestant) {
   return format(text, roster[contestant]);
 }
 
-function nightEvent5(roster, contestant) {
+function nightEvent5(roster, contestant_list) {
+  let contestant = contestant_list[0];
   let text = "@name1 searches for a place to put @poss1 sleeping bag down. ";
   if (evaluateCheck(roster, contestant, "normal", "coreSurvival")) {
     if (giveContestantTrait(roster, contestant, 2)) {
@@ -119,9 +123,9 @@ function nightEvent5(roster, contestant) {
   return format(text, roster[contestant]);
 }
 
-function nightEvent6(roster, contestant) {
-  let contestant_2 = pullRandomContestantIndex(roster);
-  roster[contestant_2].hasActed = true;
+function nightEvent6(roster, contestant_list) {
+  let contestant = contestant_list[0];
+  let contestant_2 = contestant_list[1];
 
   let text =
     "@name1 and @name2, both exhausted, wander into the same abandoned home. ";
