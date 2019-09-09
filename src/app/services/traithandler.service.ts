@@ -98,6 +98,33 @@ function evaluateTrait(
       let diff = Number(trait.properties[property].slice(11));
       if (remove) diff *= -1;
       roster[contestant].coreSocial += diff;
+    } else if (trait.properties[property].startsWith("core-wits")) {
+      let diff = Number(trait.properties[property].slice(9));
+      if (remove) diff *= -1;
+      roster[contestant].coreWits += diff;
     }
   }
+}
+
+export function checkGameStartTraits(roster: Array<Contestant>) {
+  for (let i = 0; i < roster.length; i++) {
+    let traits = findTraitsByProperty(roster, i, "behavior-game-start");
+  }
+}
+
+export function checkPhaseStartTraits(roster: Array<Contestant>) {
+  for (let i = 0; i < roster.length; i++) {
+    let traits = findTraitsByProperty(roster, i, "behavior-phase-start");
+  }
+}
+
+export function checkEventGenOverrideTraits(
+  roster: Array<Contestant>,
+  contestant: number
+) {
+  let traits = findTraitsByProperty(
+    roster,
+    contestant,
+    "behavior-event-gen-override"
+  );
 }

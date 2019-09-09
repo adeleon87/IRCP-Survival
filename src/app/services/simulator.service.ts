@@ -1,5 +1,9 @@
 import { Contestant } from "../beans/contestant";
 import { selector } from "../services/events/eventmaster.service";
+import {
+  checkGameStartTraits,
+  checkPhaseStartTraits
+} from "./traithandler.service";
 
 let output = [];
 export let roster: Array<Contestant>;
@@ -94,9 +98,12 @@ export function simulation(
   day_num = param_day_num;
 
   if (day_num <= 0) {
+    checkGameStartTraits(roster);
     preGame();
     return output;
   }
+
+  checkPhaseStartTraits(roster);
 
   day_num = param_day_num;
   day_label = is_day ? "Day" : "Night";

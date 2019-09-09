@@ -4,6 +4,7 @@ import {
   countRemainingPending,
   pullRandomContestantIndex
 } from "../simulator.service";
+import { checkEventGenOverrideTraits } from "../traithandler.service";
 
 let probability_table = {
   "-5": 0.1,
@@ -147,6 +148,8 @@ export function selector(roster, param_day_label) {
       !roster[randContestants[0]].isAlive
     );
     roster[randContestants[0]].hasActed = true;
+
+    checkEventGenOverrideTraits(roster, randContestants[0]);
 
     if (param_day_label === "Day") {
       let randEvent = Math.floor(Math.random() * dayFunctions.length);
