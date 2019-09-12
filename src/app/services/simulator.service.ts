@@ -62,7 +62,12 @@ function preGame() {
   });
   for (let contestant of roster) {
     output = output.concat({
-      text: contestant.name + " - " + contestant.bio + "\n",
+      text:
+        contestant.name +
+        " the " +
+        contestant.archetype +
+        " - " +
+        contestant.bio,
       img: [contestant.name]
     });
   }
@@ -74,7 +79,7 @@ function deathRecap() {
     if (!contestant.isAlive && contestant.hasActed) {
       deathcount++;
       output = output.concat({
-        text: contestant.name + " has died.\n",
+        text: contestant.name + " has died.",
         img: [contestant.name]
       });
     }
@@ -82,7 +87,7 @@ function deathRecap() {
   }
   if (deathcount === 0) {
     output = output.concat({
-      text: "No one died.\n",
+      text: "No one died.",
       img: []
     });
   }
@@ -109,7 +114,7 @@ export function simulation(
   day_label = is_day ? "Day" : "Night";
 
   output = output.concat({
-    text: "=== " + day_label + ": " + day_num + " ===\n",
+    text: "=== " + day_label + ": " + day_num + " ===",
     img: []
   });
 
@@ -132,7 +137,7 @@ export function simulation(
 
   //report all who died this turn, set all to "has not acted"
   output = output.concat({
-    text: "== Death Report for " + day_label + " " + day_num + " ==\n",
+    text: "== Death Report for " + day_label + " " + day_num + " ==",
     img: []
   });
   deathRecap();

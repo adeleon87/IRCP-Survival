@@ -17,6 +17,31 @@ export enum Gender {
   N = "Non-binary"
 }
 
+const archetype_library = {
+  Juggernaut: ["P", "P", "P"],
+  Naturalist: ["Su", "Su", "Su"],
+  Icon: ["So", "So", "So"],
+  Scholar: ["W", "W", "W"],
+  Hunter: ["P", "P", "Su"],
+  Warlord: ["P", "P", "So"],
+  Monk: ["P", "P", "W"],
+  Guard: ["P", "Su", "Su"],
+  Hero: ["P", "So", "So"],
+  Tactician: ["P", "W", "W"],
+  Guide: ["Su", "Su", "So"],
+  Trailblazer: ["Su", "Su", "W"],
+  Rogue: ["Su", "So", "So"],
+  Engineer: ["Su", "W", "W"],
+  Captain: ["So", "So", "W"],
+  Teacher: ["So", "W", "W"],
+  Streetwise: ["P", "Su", "So"],
+  Hermit: ["P", "Su", "W"],
+  Privileged: ["P", "So", "W"],
+  Pacifist: ["Su", "So", "W"],
+  Shoemaker: [],
+  Champion: ["P", "P", "P", "Su", "Su", "Su", "So", "So", "So", "W", "W", "W"]
+};
+
 export class Contestant {
   //identifying information
   name: string;
@@ -30,6 +55,7 @@ export class Contestant {
   coreSurvival: number;
   coreSocial: number;
   coreWits: number;
+  archetype: string;
   traits: Array<Trait>;
   relationships: Array<number>;
   isAlive: boolean;
@@ -48,15 +74,18 @@ export class Contestant {
     this.coreSurvival = json["coreSurvival"] || 0;
     this.coreSocial = json["coreSocial"] || 0;
     this.coreWits = json["coreWits"] || 0;
+    this.archetype = json["archetype"] || "";
     this.traits = json["traits"] || [];
     this.relationships = json["relationships"] || [];
     this.isAlive = true;
     this.bio = json["bio"] || "";
     this.hasActed = false;
     this.location = "";
-    this.party = -1;
+    this.party = -"P";
     this.killCount = 0;
     this.meansOfDeath = "";
+
+    this.applyArchetype();
   }
 
   kill(means: string) {
@@ -72,5 +101,23 @@ export class Contestant {
     } else {
       this.relationships[target] += amount;
     }
+  }
+
+  applyArchetype() {
+    if (this.archetype === "" || this.archetype === "Shoemaker") {
+      return;
+    }
+
+    archetype_library[this.archetype].forEach(element => {
+      if (element === "P") {
+        this.corePower++;
+      } else if (element === "Su") {
+        this.coreSurvival++;
+      } else if (element === "So") {
+        this.coreSocial++;
+      } else if (element === "W") {
+        this.coreWits++;
+      }
+    });
   }
 }

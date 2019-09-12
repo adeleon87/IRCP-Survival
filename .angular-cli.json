@@ -6,7 +6,6 @@
       "assets": ["assets", "favicon.ico"],
       "index": "index.html",
       "main": "main.ts",
-      "polyfills": "polyfills.ts",
       "prefix": "app",
       "styles": ["styles.css"],
       "scripts": [],
@@ -16,5 +15,10 @@
         "prod": "environments/environment.prod.ts"
       }
     }
-  ]
+  ],
+  "compilerOptions": {
+    "paths": {
+      "core-js/es7/reflect": ["node_modules/core-js/proposals/reflect-metadata"]
+    }
+  }
 }

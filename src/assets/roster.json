@@ -8,6 +8,7 @@
     "coreSurvival": 4,
     "coreSocial": 7,
     "coreWits": 4,
+    "archetype": "Warlord",
     "bio": "A big wolfy guy with a big wolfy punch."
   },
   {
@@ -19,6 +20,7 @@
     "coreSurvival": 7,
     "coreSocial": 7,
     "coreWits": 6,
+    "archetype": "Pacifist",
     "bio": "A wizarding boy, great with animals and smiles."
   },
   {
@@ -30,6 +32,7 @@
     "coreSurvival": 3,
     "coreSocial": 1,
     "coreWits": 9,
+    "archetype": "Tactician",
     "bio": "A menacing, hyper-intelligent AI possessing a robotic shell."
   },
   {
@@ -41,6 +44,7 @@
     "coreSurvival": 3,
     "coreSocial": 5,
     "coreWits": 7,
+    "archetype": "Streetwise",
     "bio": "A superpowered mechanic and miscreant, equipped with massive metal arms."
   },
   {
@@ -52,6 +56,7 @@
     "coreSurvival": 9,
     "coreSocial": 3,
     "coreWits": 1,
+    "archetype": "Juggernaut",
     "bio": "A massive mountain troll, well-meaning but incredibly dull."
   },
   {
@@ -63,6 +68,7 @@
     "coreSurvival": 5,
     "coreSocial": 8,
     "coreWits": 6,
+    "archetype": "Captain",
     "bio": "An unusual girl, constantly scheming with her magic over the mind."
   },
   {
@@ -74,6 +80,7 @@
     "coreSurvival": 4,
     "coreSocial": 6,
     "coreWits": 7,
+    "archetype": "Hero",
     "bio": "A friendly witch, possessing excellent hand-to-hand training and weaponized clothing."
   }
 ]
